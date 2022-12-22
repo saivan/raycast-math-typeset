@@ -7,15 +7,7 @@ import { renderSvg, typesetPath } from "./math-server"
 
 
 export default function Command( props: { }) {
-  const [searchText, setSearchText] = useState("");
-
-  const md = `
-  # This is the image
-  <img src="${renderSvg(searchText, true, true)}" />
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/800px-Image_created_with_a_mobile_phone.png" />
-  `
-  console.log(md)
-
+  const [searchText, setSearchText] = useState("")
   return (
     <List 
       isShowingDetail
@@ -26,38 +18,37 @@ export default function Command( props: { }) {
     >
       <List.Item
         title="AsciiMath"
-        subtitle="inline"
-        icon={renderSvg(searchText, true, true)} 
+        subtitle="display"
         detail={
           <List.Item.Detail 
-            markdown={md} 
+            markdown={`![${searchText}](${renderSvg(searchText, true, false)})`} 
           />
         }
       />
       <List.Item
         title="Latex"
-        subtitle="inline"
+        subtitle="display"
         detail={
           <List.Item.Detail 
-            markdown={`![${searchText}](${typesetPath(searchText, false, true)})`} 
+            markdown={`![${searchText}](${renderSvg(searchText, false, false)})`} 
           />
         }
       />
       <List.Item
         title="AsciiMath"
-        subtitle="display"
+        subtitle="inline"
         detail={
           <List.Item.Detail 
-            markdown={`![${searchText}](${typesetPath(searchText, true, false)})`} 
+            markdown={`<img src="${renderSvg(searchText, true, true)}" />`}
           />
         }
       />
       <List.Item
         title="Latex"
-        subtitle="display"
+        subtitle="inline"
         detail={
           <List.Item.Detail 
-            markdown={`![${searchText}](${typesetPath(searchText, false, false)})`} 
+            markdown={`<img src="${renderSvg(searchText, false, true)}" />`}
           />
         }
       />
