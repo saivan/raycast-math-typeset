@@ -1,8 +1,8 @@
 
-import { Detail, List } from "@raycast/api"
+import { Detail, List, render } from "@raycast/api"
 import { useEffect, useState } from "react"
 
-import { typesetPath } from "./math-server"
+import { renderSvg, typesetPath } from "./math-server"
 
 
 
@@ -11,7 +11,7 @@ export default function Command( props: { }) {
 
   const md = `
   # This is the image
-  <img src="${typesetPath(searchText, true, true)}" />
+  <img src="${renderSvg(searchText, true, true)}" />
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/800px-Image_created_with_a_mobile_phone.png" />
   `
   console.log(md)
@@ -27,7 +27,7 @@ export default function Command( props: { }) {
       <List.Item
         title="AsciiMath"
         subtitle="inline"
-        icon={typesetPath(searchText, true, true)} 
+        icon={renderSvg(searchText, true, true)} 
         detail={
           <List.Item.Detail 
             markdown={md} 
