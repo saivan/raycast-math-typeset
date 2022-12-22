@@ -10,17 +10,20 @@
     "Web"
   ],
   "license": "MIT",
-  "commands": [{
+  "commands": [
+    {
       "name": "index",
       "title": "Asciimath",
       "subtitle": "Render an equation",
       "description": "Renders an equation to asciimath",
       "mode": "view"
-  }],
+    }
+  ],
   "dependencies": {
     "@raycast/api": "^1.37.1",
     "asciimath-to-latex": "^0.5.1",
     "express": "^4.18.2",
+    "https": "^1.0.0",
     "jsdom": "^20.0.0",
     "katex": "^0.16.0",
     "mathjax": "^3.2.2",

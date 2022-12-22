@@ -9,7 +9,6 @@ import { typesetPath } from "./math-server"
 export default function Command( props: { }) {
   const [searchText, setSearchText] = useState("");
 
-
   const md = `
   # This is the image
   <img src="${typesetPath(searchText, true, true)}" />

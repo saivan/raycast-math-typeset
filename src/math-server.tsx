@@ -3,7 +3,8 @@ import express from 'express'
 import { jax } from './mathjax'
 import asciiMathToLatex from 'asciimath-to-latex'
 import fetch, { File } from 'node-fetch'
-
+import https from 'https'
+import { key, cert } from './https'
 
 
 
@@ -50,13 +51,12 @@ jaxServer.get('/typeset', function (request: any, result: any) {
 
 // Start the server
 const mathJaxPort = 38245
-jaxServer.listen(mathJaxPort, function () {
-  console.log("Started the mathjax server")
-})
+https.createServer({ key, cert }, jaxServer)
+  .listen(mathJaxPort)
 
 
 export function typesetPath (string, asciimath, inline) {
-  const path = `http://localhost:${mathJaxPort}/typeset`
+  const path = `https://localhost:${mathJaxPort}/typeset`
   const asciimathQuery = asciimath ? 'true' : 'false'
   const inlineMathQuery = inline ? 'true' : 'false'
   const encodedString = encodeURIComponent(string)
