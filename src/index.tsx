@@ -1,7 +1,6 @@
 
 import { ActionPanel, List, Action } from "@raycast/api"
 import { useEffect, useState } from "react"
-
 import { exportPngImage, exportSvgImage, renderSvg, typesetBase64Svg } from "./math-server"
 
 export default function Command( props: { }) {
@@ -20,10 +19,10 @@ export default function Command( props: { }) {
           title="Copy the svg to the clipboard"
           content={{file: exportSvgImage(searchText, asciimath, inline)}}
         />
-        {/* <Action.CopyToClipboard
+        <Action.CopyToClipboard
           title="Copy a png to the clipboard"
           content={{file: exportPngImage(searchText, asciimath, inline)}}
-        /> */}
+        />
         <Action.OpenInBrowser 
           url="https://github.com/raycast/extensions/pull/1" />
       </ActionPanel>

@@ -1,44 +1,33 @@
 
-import { jax } from './mathjax'
+import { jax, adaptor } from './mathjax'
 import asciiMathToLatex from 'asciimath-to-latex'
-import { Blob } from 'node:buffer'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import svg2img from 'svg2img'
-// import parseSvg from 'svg-parser'
+const { execSync } = require('child_process')
 
 
+const directory = os.tmpdir()
+const svgFilename = path.join(directory, `math.svg`)
+const pngFilename = path.join(directory, `math.png`)
 
-// export async function exportPngImage (
-//   string: string,
-//   useAsciimath: boolean,
-//   inline: boolean,
-// ) {
-//   // Get and parse the svg
-//   const svgString = renderSvg(string, useAsciimath, inline)
-//   const svgTree = parseSvg(svgString)
-//   const svgRoot = svgTree.children.find(node => node.tagName === 'svg');
 
-//   // Figure out the svg width and height
-//   const width = svgRoot.properties.width || 100;
-//   const height = svgRoot.properties.height || 100;
+function svgToPng (inputFile: string, outputFile: string) {
+  const command = `sips -s format png ${inputFile} --out ${outputFile}`;
+  console.log('doooooooooooooit')
+  execSync(command)
+  console.log('diduuuuuut')
+}
 
-//   // Convert it to png
-//   const directory = os.tmpdir()
-//   const filename = path.join(directory, `math.png`)
-//   const result = await new Promise(accept => {
-//     svg2img(svgString, { width, height }, (error, buffer) => {
-//       if (error) {
-//         console.error(`Error rendering SVG to PNG: ${error}`);
-//       } else {
-//         fs.writeFileSync(filename, buffer);
-//         console.log(`PNG file written to ${filename}`);
-//       }
-//     });
-
-//   })
-// }
+export function exportPngImage (
+  string: string,
+  useAsciimath: boolean,
+  inline: boolean,
+) {
+  exportSvgImage(string, useAsciimath, inline)
+  svgToPng(svgFilename, pngFilename)
+  return pngFilename
+}
 
 
 export function exportSvgImage (
@@ -47,10 +36,8 @@ export function exportSvgImage (
   inline: boolean,
 ) {
   const svgString = renderSvg(string, useAsciimath, inline)
-  const directory = os.tmpdir()
-  const filename = path.join(directory, `math.svg`)
-  fs.writeFileSync(filename, svgString)
-  return filename
+  fs.writeFileSync(svgFilename, svgString)
+  return svgFilename
 }
 
 
@@ -73,17 +60,22 @@ export function renderSvg (
 ) {
   // Given no string, return no source
   if (!string) return ''
-
-  // Generate the svg from the document
   const texString = useAsciimath ? asciiMathToLatex(string) : string
-  const adaptor = jax.startup.adaptor
-  const node = jax.tex2svg(texString, { display: !inline })
+  const node = jax.convert(texString, {
+      display: !inline,
+      // em: argv.em,
+      // ex: argv.ex,
+      // containerWidth: argv.width
+  })
 
   // Get the svg and modify its attributes
   const svg = node.children[0]
-  svg.attributes.height = '200px'
-  svg.attributes.width = '100%'
+  const { viewBox } = svg.attributes
+  const [ x, y, width, height ] = viewBox.split(' ').map(parseFloat).map(Math.round)
+  svg.attributes.height = `${height}px`
+  svg.attributes.width = `${width}px`
   const svgCode = adaptor.outerHTML(svg)
+  console.log(svgCode)
   return svgCode
 }
 
