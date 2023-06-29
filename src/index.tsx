@@ -1,10 +1,18 @@
 
-import { ActionPanel, List, Action } from "@raycast/api"
+import { ActionPanel, List, Action, Detail } from "@raycast/api"
 import { useEffect, useState } from "react"
-import { exportPngImage, exportSvgImage, renderSvg, typesetBase64Svg } from "./math-server"
+import { pngFilename, svgFilename, exportPngImage, exportSvgImage, renderSvg, typesetBase64Svg } from "./math-server"
+import { Clipboard } from "@raycast/api";
 
 export default function Command( props: { }) {
   const [searchText, setSearchText] = useState("")
+  const [loading, setLoading] = useState(true)
+
+  async function sleep (ms: number) {
+    return new Promise(done => {
+      setTimeout(done, ms)
+    })
+  }
 
   function getMarkdown(asciimath: boolean, inline: boolean) {
     const svgBase64 = typesetBase64Svg(searchText, asciimath, inline)
@@ -13,15 +21,25 @@ export default function Command( props: { }) {
   }
 
   function getActions(asciimath: boolean, inline: boolean) {
+    // Then update them
     const actionPanel = 
       <ActionPanel title="Save Mathematics">
-        <Action.CopyToClipboard
+        <Action
           title="Copy the svg to the clipboard"
-          content={{file: exportSvgImage(searchText, asciimath, inline)}}
+          onAction={async () => {
+            exportSvgImage(searchText, asciimath, inline)
+            Clipboard.copy({file: svgFilename })
+          }}
         />
-        <Action.CopyToClipboard
+        <Action
           title="Copy a png to the clipboard"
-          content={{file: exportPngImage(searchText, asciimath, inline)}}
+          onAction={async () => {
+            exportSvgImage(searchText, asciimath, inline)
+            exportPngImage(searchText, asciimath, inline)
+            await sleep(1000)
+            Clipboard.copy({file: pngFilename })
+            console.log(svgFilename, pngFilename)
+          }}
         />
         <Action.OpenInBrowser 
           url="https://github.com/raycast/extensions/pull/1" />
@@ -40,25 +58,25 @@ export default function Command( props: { }) {
       <List.Item
         title="AsciiMath"
         subtitle="display"
-        detail={ <List.Item.Detail markdown={getMarkdown(true, false)} /> }
-        actions={getActions(true, false) }
+        detail={<List.Item.Detail markdown={ getMarkdown(true, false) } />} 
+        actions={getActions(true, false)}
       />
       <List.Item
         title="Latex"
         subtitle="display"
-        detail={ <List.Item.Detail markdown={getMarkdown(false, false)} /> }
+        detail={<List.Item.Detail markdown={ getMarkdown(false, false) } />} 
         actions={getActions(false, false) }
       />
       <List.Item
         title="AsciiMath"
         subtitle="inline"
-        detail={ <List.Item.Detail markdown={getMarkdown(true, true)} /> }
+        detail={ <List.Item.Detail markdown={ getMarkdown(true, true) } />} 
         actions={getActions(true, true) }
       />
       <List.Item
         title="Latex"
         subtitle="inline"
-        detail={ <List.Item.Detail markdown={getMarkdown(false, true)} /> }
+        detail={<List.Item.Detail markdown={ getMarkdown(false, true) } />} 
         actions={getActions(true, false) }
       />
     </List>

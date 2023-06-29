@@ -5,19 +5,14 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 const { execSync } = require('child_process')
+import { useExec } from "@raycast/utils"
 
 
 const directory = os.tmpdir()
-const svgFilename = path.join(directory, `math.svg`)
-const pngFilename = path.join(directory, `math.png`)
+export const svgFilename = path.join(directory, `math.svg`)
+export const pngFilename = path.join(directory, `math.png`)
 
 
-function svgToPng (inputFile: string, outputFile: string) {
-  const command = `sips -s format png ${inputFile} --out ${outputFile}`;
-  console.log('doooooooooooooit')
-  execSync(command)
-  console.log('diduuuuuut')
-}
 
 export function exportPngImage (
   string: string,
@@ -25,8 +20,11 @@ export function exportPngImage (
   inline: boolean,
 ) {
   exportSvgImage(string, useAsciimath, inline)
-  svgToPng(svgFilename, pngFilename)
-  return pngFilename
+  const convert = `/opt/homebrew/bin/convert`
+  const command = `${convert} -background none ${svgFilename} ${pngFilename}`
+  console.log(command)
+  const execResult = execSync(command)
+  return execResult.toString()
 }
 
 
@@ -75,7 +73,6 @@ export function renderSvg (
   svg.attributes.height = `${height}px`
   svg.attributes.width = `${width}px`
   const svgCode = adaptor.outerHTML(svg)
-  console.log(svgCode)
   return svgCode
 }
 
